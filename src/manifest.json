@@ -1,0 +1,45 @@
+{
+    "manifest_version": 3,
+    "name": "ContextMemo",
+    "version": "1.0.0",
+    "description": "Persistent web annotator - Highlight text and attach notes that persist across page visits",
+    "permissions": [
+        "storage",
+        "contextMenus",
+        "activeTab",
+        "scripting"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "src/background/service-worker.js",
+        "type": "module"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "src/content/content-script.jsx"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "action": {
+        "default_popup": "src/popup/index.html",
+        "default_title": "ContextMemo"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "assets/*",
+                "src/content/*"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
+}
