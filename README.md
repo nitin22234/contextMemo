@@ -54,7 +54,7 @@ One of the hardest challenges is ensuring your highlight re-appears even when th
 
 ContextMemo solves this using a 4-Layer Hybrid Anchoring Engine:
 
-🔹 Layer 1 — XPath (Exact DOM Position)
+ Layer 1 — XPath (Exact DOM Position)
 
 Full absolute XPath
 
@@ -64,7 +64,7 @@ Pros: Extremely precise
 
 Cons: Breaks with DOM restructuring
 
-🔹 Layer 2 — CSS Selector (Flexible Structural Path)
+Layer 2 — CSS Selector (Flexible Structural Path)
 
 Builds a unique CSS selector using:
 
@@ -78,7 +78,7 @@ More resilient to DOM changes than XPath
 
 Still may break if class names change dynamically
 
-🔹 Layer 3 — Context Matching (Fuzzy Logic)
+ Layer 3 — Context Matching (Fuzzy Logic)
 
 ContextMemo stores:
 
@@ -92,7 +92,7 @@ It then rescans every text node to find the same contextual pattern.
 
 Extremely robust even with page layout changes.
 
-🔹 Layer 4 — Global Text Search (Last Resort)
+Layer 4 — Global Text Search (Last Resort)
 
 Reads every text node using a TreeWalker
 
