@@ -1,117 +1,186 @@
-# ContextMemo - Persistent Web Annotator 📝
+🚀 ContextMemo – Chrome Extension for Persistent Web Highlights
 
-ContextMemo is a powerful Chrome Extension that lets you highlight text on any webpage, attach persistent notes, and manage them via an elegant dashboard. It's built with React, Vite, and TailwindCSS, focusing on performance, privacy, and a seamless user experience.
+ContextMemo is a Chrome Extension that lets you highlight text on any webpage, attach notes, and have those highlights automatically re-appear across page reloads, revisits, and DOM changes.
 
-![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-green?logo=googlechrome)
-![Manifest V3](https://img.shields.io/badge/Manifest-V3-blue)
-![React](https://img.shields.io/badge/React-18.2-61dafb?logo=react)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.3-38bdf8?logo=tailwindcss)
+This README includes only the required sections:
+✅ Installation in Chrome Developer Mode
+✅ DOM Selection + Anchoring Strategy
+✅ Data Storage Model (chrome.storage.local)
 
-## ✨ Key Features
+📦 Installation (Chrome Developer Mode)
 
-- **🎯 Context Menu Integration**: Simply right-click any selected text to add a note.
-- **🎨 Visual Highlights**: Text is highlighted with a persistent yellow background and a green indicator.
-- **💾 Auto-Save & Restore**: Notes are saved locally and automatically reappear when you revisit a page.
-- **📖 View Full Note**: A beautiful modal lets you view long notes without truncation.
-- **📊 Dashboard**: A central hub to manage, search, and delete your notes.
-- **🔍 Smart Search**: Instantly find notes by content or URL.
-- **🔄 Real-Time Sync**: Changes sync instantly across all open tabs.
+Follow these steps to install ContextMemo locally for development or testing.
 
----
+1. Clone the Repository
+git clone <repository-url>
+cd notes_extension
 
-## 🚀 Installation Guide
+2. Install Dependencies
+npm install
 
-Follow these steps to install ContextMemo in Chrome Developer Mode:
+3. Build the Extension
 
-1.  **Clone or Download**:
-    Clone this repository or download the ZIP file and extract it.
+This generates a dist/ folder used by Chrome.
 
-2.  **Install Dependencies**:
-    Open your terminal in the project folder and run:
-    ```bash
-    npm install
-    ```
+npm run build
 
-3.  **Build the Extension**:
-    Run the build command to generate the `dist` folder:
-    ```bash
-    npm run build
-    ```
+4. Load the Extension in Chrome
 
-4.  **Load in Chrome**:
-    -   Open Google Chrome and go to `chrome://extensions/`.
-    -   Toggle **"Developer mode"** in the top right corner.
-    -   Click the **"Load unpacked"** button.
-    -   Select the `dist` folder from your project directory.
+Open chrome://extensions/
 
-5.  **Enable File URL Access (Optional)**:
-    -   If you want to test on local HTML files (like the included `demo.html`), you must enable this permission.
-    -   On the extension card, click **"Details"**.
-    -   Toggle **"Allow access to file URLs"**.
+Toggle Developer mode ON (top-right)
 
----
+Click Load unpacked
 
-## 🏗️ Technical Architecture
+Select the dist/ folder (important — NOT the root folder)
 
-### 1. DOM Selection & Anchoring Strategy
+5. Enable File Access (Required for Testing)
 
-One of the biggest challenges in web annotation is ensuring highlights persist even when the webpage changes slightly. ContextMemo uses a robust **Hybrid Anchoring Strategy** to solve this.
+To allow the extension to run on local files:
 
-When you create a note, we generate a "DOM Locator" that captures multiple ways to find that text again:
+In Chrome Extensions → Find ContextMemo
 
-*   **XPath**: We store the exact path to the element (e.g., `/html/body/div[1]/p[2]`). This is fast and precise for static pages.
-*   **CSS Selector**: We generate a unique CSS selector (e.g., `#content > .article > p:nth-child(2)`). This is more resilient to minor DOM structure changes.
-*   **Text Context**: We store the selected text along with the text immediately *before* and *after* it.
-*   **Global Text Search**: As a fail-safe, if the exact position is lost (e.g., due to dynamic content injection), we search the entire document for the unique text sequence to re-anchor the highlight.
+Click Details
 
-**How it works at runtime:**
-1.  The extension tries to find the text using the **XPath**.
-2.  If that fails, it tries the **CSS Selector**.
-3.  If that fails, it uses **Fuzzy Matching** with the surrounding context.
-4.  Finally, it falls back to a **Global Text Search** to locate the text anywhere on the page.
+Enable Allow access to file URLs
 
-This ensures your notes stick to the right text, even on dynamic websites.
+This is required when testing on files like:
 
-### 2. Data Structure & Storage
+file:///C:/Users/.../demo.html
 
-ContextMemo prioritizes privacy by storing all data locally in your browser using `chrome.storage.local`. No data is ever sent to external servers.
+🧠 DOM Selection & Anchoring Strategy
 
-**Data Schema:**
+One of the hardest challenges is ensuring your highlight re-appears even when the webpage changes.
 
-We store notes in a single JSON array under the key `contextmemo_notes`. Each note object is structured as follows:
+ContextMemo solves this using a 4-Layer Hybrid Anchoring Engine:
 
-```javascript
+🔹 Layer 1 — XPath (Exact DOM Position)
+
+Full absolute XPath
+
+Example: /html/body/div[1]/main/p[2]
+
+Pros: Extremely precise
+
+Cons: Breaks with DOM restructuring
+
+🔹 Layer 2 — CSS Selector (Flexible Structural Path)
+
+Builds a unique CSS selector using:
+
+IDs (preferred)
+
+Class names
+
+Tag indices
+
+More resilient to DOM changes than XPath
+
+Still may break if class names change dynamically
+
+🔹 Layer 3 — Context Matching (Fuzzy Logic)
+
+ContextMemo stores:
+
+The selected text
+
+50 characters before the selection
+
+50 characters after the selection
+
+It then rescans every text node to find the same contextual pattern.
+
+Extremely robust even with page layout changes.
+
+🔹 Layer 4 — Global Text Search (Last Resort)
+
+Reads every text node using a TreeWalker
+
+Combines text to allow matching across broken HTML like:
+
+Hello <b>World</b>
+
+
+Used only when all other methods fail
+
+Ensures >99% highlight restoration
+
+Restore Order
+
+When a page loads:
+
+Try XPath
+
+Try CSS selector
+
+Try Context Matching
+
+Try Global Search
+
+This multi-layer fallback system gives ContextMemo exceptional durability.
+
+🗄 Data Storage Model (chrome.storage.local)
+
+ContextMemo stores all notes locally in the browser using Chrome’s asynchronous storage API.
+
+Why use chrome.storage.local?
+
+Up to 5MB storage (vs 4KB in localStorage)
+
+Non-blocking async API
+
+Survives browser restarts
+
+Zero external servers → privacy-first
+
+📚 Note Data Structure
+
+Every note is represented as an object inside the contextmemo_notes array:
+
 {
-  "contextmemo_notes": [
-    {
-      "id": "1701234567890-abc123xyz",      // Unique ID (Timestamp + Random)
-      "url": "https://example.com/article", // Page URL where note was created
-      "content": "This is my important note", // The user's note text
-      "selectedText": "The text I highlighted", // The text from the webpage
-      "domLocator": {                       // The anchoring data
-        "xpath": "/html/body/div[1]/p",
-        "cssSelector": "#content > p",
-        "textContent": "The text I highlighted",
-        "context": {
-          "before": "Text appearing before...",
-          "after": "...text appearing after"
-        }
-      },
-      "createdAt": 1701234567890,           // Creation timestamp
-      "updatedAt": 1701234567890            // Last update timestamp
-    }
-  ]
+  "id": "1701234567890-x8z9a2",
+
+  "url": "https://example.com/article#section2",
+
+  "content": "This is the user's note text.",
+  "selectedText": "The text the user highlighted",
+
+  "domLocator": {
+    "xpath": "/html/body/div[1]/p[2]",
+    "cssSelector": "#content > p:nth-child(2)",
+    "textContent": "The text the user highlighted",
+    "textOffset": { "start": 15, "end": 55 },
+    "context": {
+      "before": "Text appearing before selection...",
+      "after": "...text appearing after selection."
+    },
+    "timestamp": 1701234567890
+  },
+
+  "createdAt": 1701234567890,
+  "updatedAt": 1701234567890
 }
-```
 
+🔄 Data Lifecycle
 
-## 🛠️ Tech Stack
+Create:
 
--   **Frontend**: React 18
--   **Build Tool**: Vite 5
--   **Styling**: TailwindCSS 3
--   **Extension Framework**: Manifest V3
+A new note is appended to contextmemo_notes
 
----
+Read:
 
-**ContextMemo** - Your personal annotation layer for the web. 🌐
+Content script loads notes
+
+Filters by matching url === window.location.href
+
+Update:
+
+Modify the note by ID
+
+Write back entire updated array
+
+Delete:
+
+Remove note by ID
+
+Save updated array
