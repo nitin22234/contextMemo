@@ -1,13 +1,13 @@
-🚀 ContextMemo – Chrome Extension for Persistent Web Highlights
+ ContextMemo – Chrome Extension for Persistent Web Highlights
 
 ContextMemo is a Chrome Extension that lets you highlight text on any webpage, attach notes, and have those highlights automatically re-appear across page reloads, revisits, and DOM changes.
 
 This README includes only the required sections:
-✅ Installation in Chrome Developer Mode
-✅ DOM Selection + Anchoring Strategy
-✅ Data Storage Model (chrome.storage.local)
+ Installation in Chrome Developer Mode
+ DOM Selection + Anchoring Strategy
+ Data Storage Model (chrome.storage.local)
 
-📦 Installation (Chrome Developer Mode)
+ Installation (Chrome Developer Mode)
 
 Follow these steps to install ContextMemo locally for development or testing.
 
@@ -48,7 +48,7 @@ This is required when testing on files like:
 
 file:///C:/Users/.../demo.html
 
-🧠 DOM Selection & Anchoring Strategy
+ DOM Selection & Anchoring Strategy
 
 One of the hardest challenges is ensuring your highlight re-appears even when the webpage changes.
 
@@ -133,7 +133,7 @@ Survives browser restarts
 
 Zero external servers → privacy-first
 
-📚 Note Data Structure
+ Note Data Structure
 
 Every note is represented as an object inside the contextmemo_notes array:
 
@@ -161,22 +161,17 @@ Every note is represented as an object inside the contextmemo_notes array:
   "updatedAt": 1701234567890
 }
 
-🔄 Data Lifecycle
+ Data Lifecycle
 
 Create:
-
 A new note is appended to contextmemo_notes
 
 Read:
-
 Content script loads notes
-
 Filters by matching url === window.location.href
 
 Update:
-
 Modify the note by ID
-
 Write back entire updated array
 
 Delete:
